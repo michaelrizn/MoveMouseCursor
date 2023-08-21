@@ -2,39 +2,59 @@ import SwiftUI
 
 struct MouseCursorView: View {
     @State private var cursorPosition: CGPoint = .zero
+    @State private var isMoving = false
+    @State private var moveCount = 0
+    @State private var nextMoveIn: Double = 5.0
+    @State private var timer: Timer? = nil
     
     var body: some View {
-        Text("Mouse Cursor Mover")
-            .padding()
-            .onAppear {
-                moveCursor()
+        VStack {
+            Text("Mouse Cursor Mover")
+                .padding()
+            
+            Button(action: {
+                isMoving.toggle()
+                if isMoving {
+                    nextMoveIn = 5.0
+                    moveCursor()
+                } else {
+                    timer?.invalidate()
+                    timer = nil
+                }
+            }) {
+                Text(isMoving ? "Stop Moving" : "Start Moving")
             }
+            
+            Text("Move Count: \(moveCount)")
+                .font(.headline)
+                .padding(.top, 10)
+            
+            Text(String(format: "Next Move in: %.2f seconds", nextMoveIn))
+                .font(.headline)
+                .padding(.top, 5)
+            
+            Button("Quit") {
+                NSApplication.shared.terminate(self)
+            }
+        }
+        .padding()
     }
     
     private func moveCursor() {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-            moveCursorToLeft()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
+            nextMoveIn -= 0.01
+            if nextMoveIn <= 0 {
+                self.moveCursorByOnePixel()
+                self.moveCount += 1
+                nextMoveIn = 5.0
+            }
         }
     }
     
-    private func moveCursorToLeft() {
-        let initialPosition = NSEvent.mouseLocation
-        var newCursorPosition = initialPosition
-        newCursorPosition.x -= 1
-        CGWarpMouseCursorPosition(newCursorPosition)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            moveCursorToRight()
-        }
-    }
-    
-    private func moveCursorToRight() {
-        let initialPosition = NSEvent.mouseLocation
-        var newCursorPosition = initialPosition
-        newCursorPosition.x += 1
-        CGWarpMouseCursorPosition(newCursorPosition)
-        
-        // Recursive call to repeat the movement
-        moveCursorToLeft()
+    private func moveCursorByOnePixel() {
+        let currentPos = NSEvent.mouseLocation
+        let newPos = CGPoint(x: currentPos.x + 1, y: currentPos.y)
+        CGDisplayMoveCursorToPoint(0, newPos)
+        usleep(1000) // Add a small delay to ensure accurate 1-pixel movement
     }
 }
