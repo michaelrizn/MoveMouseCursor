@@ -7,19 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		093404BF2A93F62F00F0B6AF /* MoveMouseCursorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093404BE2A93F62F00F0B6AF /* MoveMouseCursorApp.swift */; };
+		093404BF2A93F62F00F0B6AF /* MouseCursorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093404BE2A93F62F00F0B6AF /* MouseCursorApp.swift */; };
 		093404C12A93F62F00F0B6AF /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093404C02A93F62F00F0B6AF /* ContentView.swift */; };
 		093404C32A93F63000F0B6AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 093404C22A93F63000F0B6AF /* Assets.xcassets */; };
 		093404C62A93F63000F0B6AF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 093404C52A93F63000F0B6AF /* Preview Assets.xcassets */; };
+		093404CE2A93F73500F0B6AF /* MouseCursorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093404CD2A93F73500F0B6AF /* MouseCursorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		093404BB2A93F62F00F0B6AF /* MoveMouseCursor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoveMouseCursor.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		093404BE2A93F62F00F0B6AF /* MoveMouseCursorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveMouseCursorApp.swift; sourceTree = "<group>"; };
+		093404BE2A93F62F00F0B6AF /* MouseCursorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseCursorApp.swift; sourceTree = "<group>"; };
 		093404C02A93F62F00F0B6AF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		093404C22A93F63000F0B6AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		093404C52A93F63000F0B6AF /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		093404C72A93F63000F0B6AF /* MoveMouseCursor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoveMouseCursor.entitlements; sourceTree = "<group>"; };
+		093404CD2A93F73500F0B6AF /* MouseCursorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseCursorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,8 +54,9 @@
 		093404BD2A93F62F00F0B6AF /* MoveMouseCursor */ = {
 			isa = PBXGroup;
 			children = (
-				093404BE2A93F62F00F0B6AF /* MoveMouseCursorApp.swift */,
+				093404BE2A93F62F00F0B6AF /* MouseCursorApp.swift */,
 				093404C02A93F62F00F0B6AF /* ContentView.swift */,
+				093404CD2A93F73500F0B6AF /* MouseCursorView.swift */,
 				093404C22A93F63000F0B6AF /* Assets.xcassets */,
 				093404C72A93F63000F0B6AF /* MoveMouseCursor.entitlements */,
 				093404C42A93F63000F0B6AF /* Preview Content */,
@@ -139,8 +142,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				093404CE2A93F73500F0B6AF /* MouseCursorView.swift in Sources */,
 				093404C12A93F62F00F0B6AF /* ContentView.swift in Sources */,
-				093404BF2A93F62F00F0B6AF /* MoveMouseCursorApp.swift in Sources */,
+				093404BF2A93F62F00F0B6AF /* MouseCursorApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
