@@ -1,34 +1,41 @@
 import SwiftUI
 
 struct MouseCursorView: View {
-    @State private var isMoving = false
-    @State private var moveCount = 0
-    @State private var nextMoveIn: Double = 5.0
+    @State private var isClicking = false
+    @State private var clickCount = 0
+    @State private var nextClickIn: Double = 5.0
     @State private var timer: Timer? = nil
     
     var body: some View {
         VStack {
-            Text("Mouse Cursor Mover")
+            HStack {
+                Spacer()
+                Text("X")
+                    .font(.system(size: 24))
+                    .padding(.trailing, 20)
+            }
+            
+            Text("Mouse Cursor Clicker")
                 .padding()
             
             Button(action: {
-                isMoving.toggle()
-                if isMoving {
-                    nextMoveIn = 5.0
-                    moveCursor()
+                isClicking.toggle()
+                if isClicking {
+                    nextClickIn = 5.0
+                    startClicking()
                 } else {
                     timer?.invalidate()
                     timer = nil
                 }
             }) {
-                Text(isMoving ? "Stop Moving" : "Start Moving")
+                Text(isClicking ? "Stop Clicking" : "Start Clicking")
             }
             
-            Text("Move Count: \(moveCount)")
+            Text("Click Count: \(clickCount)")
                 .font(.headline)
                 .padding(.top, 10)
             
-            Text(String(format: "Next Move in: %.2f seconds", nextMoveIn))
+            Text(String(format: "Next Click in: %.2f seconds", nextClickIn))
                 .font(.headline)
                 .padding(.top, 5)
             
@@ -40,23 +47,33 @@ struct MouseCursorView: View {
         .frame(width: 300, height: 200)
     }
     
-    private func moveCursor() {
+    private func startClicking() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
-            nextMoveIn -= 0.01
-            if nextMoveIn <= 0 {
-                self.moveCursorRandomly()
-                self.moveCount += 1
-                nextMoveIn = 5.0
+            nextClickIn -= 0.01
+            if nextClickIn <= 0 {
+                moveCursorToX()
+                self.simulateMouseClick()
+                self.clickCount += 1
+                nextClickIn = 5.0
             }
         }
     }
     
-    private func moveCursorRandomly() {
-        let currentPos = NSEvent.mouseLocation
-        let xOffset = Int.random(in: -1...1)
-        let yOffset = Int.random(in: -1...1)
-        let newPos = CGPoint(x: currentPos.x + CGFloat(xOffset), y: currentPos.y + CGFloat(yOffset))
-        CGDisplayMoveCursorToPoint(0, newPos)
-        usleep(1000) // Add a small delay to ensure accurate movement
+    private func moveCursorToX() {
+        let source = CGEventSource(stateID: .hidSystemState)
+        let xPosition = NSApplication.shared.windows.first?.frame.midX ?? 0
+        let yPosition = NSApplication.shared.windows.first?.frame.midY ?? 0
+        let mouseMove = CGEvent(mouseEventSource: source, mouseType: .mouseMoved, mouseCursorPosition: CGPoint(x: xPosition, y: yPosition), mouseButton: .left)
+        mouseMove?.post(tap: .cghidEventTap)
+    }
+    
+    private func simulateMouseClick() {
+        let source = CGEventSource(stateID: .hidSystemState)
+        let mousePos = CGPoint(x: NSApplication.shared.windows.first?.frame.midX ?? 0,
+                               y: NSApplication.shared.windows.first?.frame.midY ?? 0)
+        let mouseClick = CGEvent(mouseEventSource: source, mouseType: .otherMouseDown, mouseCursorPosition: mousePos, mouseButton: .center)
+        mouseClick?.post(tap: .cghidEventTap)
+        let mouseRelease = CGEvent(mouseEventSource: source, mouseType: .otherMouseUp, mouseCursorPosition: mousePos, mouseButton: .center)
+        mouseRelease?.post(tap: .cghidEventTap)
     }
 }

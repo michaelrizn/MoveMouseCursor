@@ -4,7 +4,7 @@ import SwiftUI
 struct MouseCursorApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MouseCursorView()
         }
     }
 }
