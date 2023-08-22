@@ -8,29 +8,6 @@ struct MouseCursorView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-                Text("X")
-                    .font(.system(size: 24))
-                    .padding(.trailing, 20)
-            }
-            
-            Text("Mouse Cursor Clicker")
-                .padding()
-            
-            Button(action: {
-                isClicking.toggle()
-                if isClicking {
-                    nextClickIn = 5.0
-                    startClicking()
-                } else {
-                    timer?.invalidate()
-                    timer = nil
-                }
-            }) {
-                Text(isClicking ? "Stop Clicking" : "Start Clicking")
-            }
-            
             Text("Click Count: \(clickCount)")
                 .font(.headline)
                 .padding(.top, 10)
@@ -38,6 +15,28 @@ struct MouseCursorView: View {
             Text(String(format: "Next Click in: %.2f seconds", nextClickIn))
                 .font(.headline)
                 .padding(.top, 5)
+            
+            Button(action: {
+                isClicking.toggle()
+                if isClicking {
+                    clickCount = 0  // Сброс счетчика срабатываний
+                    nextClickIn = 5.0
+                    startClicking()
+                } else {
+                    timer?.invalidate()
+                    timer = nil
+                }
+            }) {
+                HStack {
+                    Text(isClicking ? "Stop Clicking" : "Start Clicking")
+                    Spacer()
+                    Text("Control + 1")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .keyboardShortcut("1", modifiers: [.control])
+            .padding(.bottom, 10)
             
             Button("Quit") {
                 NSApplication.shared.terminate(self)
@@ -51,20 +50,11 @@ struct MouseCursorView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
             nextClickIn -= 0.01
             if nextClickIn <= 0 {
-                moveCursorToX()
                 self.simulateMouseClick()
                 self.clickCount += 1
                 nextClickIn = 5.0
             }
         }
-    }
-    
-    private func moveCursorToX() {
-        let source = CGEventSource(stateID: .hidSystemState)
-        let xPosition = NSApplication.shared.windows.first?.frame.midX ?? 0
-        let yPosition = NSApplication.shared.windows.first?.frame.midY ?? 0
-        let mouseMove = CGEvent(mouseEventSource: source, mouseType: .mouseMoved, mouseCursorPosition: CGPoint(x: xPosition, y: yPosition), mouseButton: .left)
-        mouseMove?.post(tap: .cghidEventTap)
     }
     
     private func simulateMouseClick() {
@@ -75,5 +65,11 @@ struct MouseCursorView: View {
         mouseClick?.post(tap: .cghidEventTap)
         let mouseRelease = CGEvent(mouseEventSource: source, mouseType: .otherMouseUp, mouseCursorPosition: mousePos, mouseButton: .center)
         mouseRelease?.post(tap: .cghidEventTap)
+    }
+}
+
+struct MouseCursorView_Previews: PreviewProvider {
+    static var previews: some View {
+        MouseCursorView()
     }
 }

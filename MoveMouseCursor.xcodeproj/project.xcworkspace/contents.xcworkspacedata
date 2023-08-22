@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:">
+      location = "self:/Users/mikhailryazanov/Documents/Xcode projects/MoveMouseCursor/MoveMouseCursor.xcodeproj">
    </FileRef>
 </Workspace>
