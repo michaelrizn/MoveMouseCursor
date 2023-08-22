@@ -3,7 +3,8 @@ import SwiftUI
 struct MouseCursorView: View {
     @State private var isClicking = false
     @State private var clickCount = 0
-    @State private var nextClickIn: Double = 5.0
+    @State private var nextClickIn: Double = 60.0
+    @State private var customIntervalText = ""
     @State private var timer: Timer? = nil
     
     var body: some View {
@@ -16,11 +17,19 @@ struct MouseCursorView: View {
                 .font(.headline)
                 .padding(.top, 5)
             
+            HStack {
+                Text("Custom Interval (sec):")
+                TextField("Enter interval", text: $customIntervalText, onCommit: setCustomInterval)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(width: 60)
+                Button("Set", action: setCustomInterval)
+            }
+            .padding(.bottom, 10)
+            
             Button(action: {
                 isClicking.toggle()
                 if isClicking {
-                    clickCount = 0  // Сброс счетчика срабатываний
-                    nextClickIn = 5.0
+                    clickCount = 0
                     startClicking()
                 } else {
                     timer?.invalidate()
@@ -43,17 +52,31 @@ struct MouseCursorView: View {
             }
         }
         .padding()
-        .frame(width: 300, height: 200)
+        .frame(width: 300, height: 250)
     }
     
     private func startClicking() {
+        if let interval = Double(customIntervalText), interval > 0 {
+            nextClickIn = interval
+        }
+        
         timer = Timer.scheduledTimer(withTimeInterval: 0.01, repeats: true) { timer in
             nextClickIn -= 0.01
             if nextClickIn <= 0 {
                 self.simulateMouseClick()
                 self.clickCount += 1
-                nextClickIn = 5.0
+                if let interval = Double(self.customIntervalText), interval > 0 {
+                    self.nextClickIn = interval
+                } else {
+                    self.nextClickIn = 60.0
+                }
             }
+        }
+    }
+    
+    private func setCustomInterval() {
+        if let interval = Double(customIntervalText), interval > 0 {
+            nextClickIn = interval
         }
     }
     
