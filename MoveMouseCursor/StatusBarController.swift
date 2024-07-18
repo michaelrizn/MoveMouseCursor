@@ -115,17 +115,21 @@ class StatusBarController: ObservableObject {
     }
     
     private func simulateMouseMove() {
+        let moveDistance: CGFloat = 1 // Изменение: движение на число пикселей, тип CGFloat
         let currentPosition = NSEvent.mouseLocation
         let screenFrame = NSScreen.main!.frame
         
-        var newX = currentPosition.x + (moveLeft ? -1 : 1)
+        var newX = currentPosition.x + (moveLeft ? -moveDistance : moveDistance)
         
         // Проверяем, не вышли ли мы за границы экрана
         newX = max(0, min(newX, screenFrame.width - 1))
         
         // Преобразуем координаты в систему координат CGPoint
         let newPosition = CGPoint(x: newX, y: screenFrame.height - currentPosition.y)
-        CGWarpMouseCursorPosition(newPosition)
+        
+        // Создаем событие мыши для перемещения курсора
+        let mouseMoveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: newPosition, mouseButton: .left)
+        mouseMoveEvent?.post(tap: .cghidEventTap)
         
         moveLeft.toggle() // Меняем направление для следующего движения
         moveCount += 1
