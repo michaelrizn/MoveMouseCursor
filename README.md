@@ -1,3 +1,6 @@
+<img width="302" alt="image" src="https://github.com/user-attachments/assets/ba430336-c3ef-489a-a9b9-ab14b4671619">
+
+
 # Mouse Mover for macOS - Stay Online Tool
 
 *This application was created using prompt engineering techniques.*
