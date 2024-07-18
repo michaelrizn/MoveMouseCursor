@@ -9,7 +9,8 @@ class StatusBarController: ObservableObject {
     @Published var isMoving = false
     @Published var nextMoveIn: Int = 60
     private var moveInterval: Int = 60
-    private var clickCount: Int = 0
+    private var moveCount: Int = 0
+    private var moveLeft = true
 
     init() {
         setupStatusBar()
@@ -20,7 +21,7 @@ class StatusBarController: ObservableObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let statusBarButton = statusItem?.button {
-            statusBarButton.image = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "Движение курсора")
+            statusBarButton.image = NSImage(systemSymbolName: "arrow.left.and.right", accessibilityDescription: "Движение курсора")
             statusBarButton.action = #selector(togglePopover)
             statusBarButton.target = self
         }
@@ -75,6 +76,7 @@ class StatusBarController: ObservableObject {
     
     func startMoving() {
         nextMoveIn = moveInterval
+        moveLeft = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.updateTimer()
         }
@@ -103,34 +105,26 @@ class StatusBarController: ObservableObject {
                 self.statusItem?.button?.image = nil
             } else {
                 self.statusItem?.button?.title = ""
-                self.statusItem?.button?.image = NSImage(systemSymbolName: "cursorarrow.rays", accessibilityDescription: "Движение курсора")
+                self.statusItem?.button?.image = NSImage(systemSymbolName: "arrow.left.and.right", accessibilityDescription: "Движение курсора")
             }
         }
     }
     
     private func simulateMouseMove() {
-        let currentMousePosition = NSEvent.mouseLocation
+        let currentPosition = NSEvent.mouseLocation
         let screenFrame = NSScreen.main!.frame
         
-        // Вычисляем новую позицию курсора (например, сдвиг на 1 пиксель вправо)
-        var newX = currentMousePosition.x + 1
-        var newY = currentMousePosition.y
+        var newX = currentPosition.x + (moveLeft ? -1 : 1)
         
         // Проверяем, не вышли ли мы за границы экрана
-        if newX >= screenFrame.width {
-            newX = 0 // Перемещаем курсор в левую часть экрана
-        }
-        if newY >= screenFrame.height {
-            newY = 0 // Перемещаем курсор в нижнюю часть экрана
-        }
+        newX = max(0, min(newX, screenFrame.width - 1))
         
         // Преобразуем координаты в систему координат CGPoint
-        let newPosition = CGPoint(x: newX, y: screenFrame.height - newY)
-        
-        // Перемещаем курсор
+        let newPosition = CGPoint(x: newX, y: screenFrame.height - currentPosition.y)
         CGWarpMouseCursorPosition(newPosition)
         
-        clickCount += 1
+        moveLeft.toggle() // Меняем направление для следующего движения
+        moveCount += 1
     }
     
     func setCustomInterval(_ interval: Int) {
@@ -141,7 +135,7 @@ class StatusBarController: ObservableObject {
     }
     
     func getClickCount() -> Int {
-        return clickCount
+        return moveCount
     }
 }
 
