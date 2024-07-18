@@ -13,6 +13,7 @@
 		093404C62A93F63000F0B6AF /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 093404C52A93F63000F0B6AF /* Preview Assets.xcassets */; };
 		093404CE2A93F73500F0B6AF /* MouseCursorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 093404CD2A93F73500F0B6AF /* MouseCursorView.swift */; };
 		0968849D2C49540400EA6355 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0968849C2C49540400EA6355 /* README.md */; };
+		0968849F2C49568600EA6355 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0968849E2C49568600EA6355 /* StatusBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		093404C72A93F63000F0B6AF /* MoveMouseCursor.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoveMouseCursor.entitlements; sourceTree = "<group>"; };
 		093404CD2A93F73500F0B6AF /* MouseCursorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MouseCursorView.swift; sourceTree = "<group>"; };
 		0968849C2C49540400EA6355 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0968849E2C49568600EA6355 /* StatusBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				093404BE2A93F62F00F0B6AF /* MouseCursorApp.swift */,
 				093404C02A93F62F00F0B6AF /* ContentView.swift */,
 				093404CD2A93F73500F0B6AF /* MouseCursorView.swift */,
+				0968849E2C49568600EA6355 /* StatusBarController.swift */,
 				093404C22A93F63000F0B6AF /* Assets.xcassets */,
 				093404C72A93F63000F0B6AF /* MoveMouseCursor.entitlements */,
 				093404C42A93F63000F0B6AF /* Preview Content */,
@@ -147,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				093404CE2A93F73500F0B6AF /* MouseCursorView.swift in Sources */,
+				0968849F2C49568600EA6355 /* StatusBarController.swift in Sources */,
 				093404C12A93F62F00F0B6AF /* ContentView.swift in Sources */,
 				093404BF2A93F62F00F0B6AF /* MouseCursorApp.swift in Sources */,
 			);
