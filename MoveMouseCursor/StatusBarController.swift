@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import IOKit.pwr_mgt
 
 class StatusBarController: ObservableObject {
     private var statusItem: NSStatusItem?
@@ -11,6 +12,7 @@ class StatusBarController: ObservableObject {
     private var moveInterval: Int = 60
     private var moveCount: Int = 0
     private var moveLeft = true
+    private var assertionID: IOPMAssertionID = 0
 
     init() {
         setupStatusBar()
@@ -80,12 +82,14 @@ class StatusBarController: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.updateTimer()
         }
+        preventSleep()
     }
     
     func stopMoving() {
         timer?.invalidate()
         timer = nil
         nextMoveIn = moveInterval
+        allowSleep()
     }
     
     private func updateTimer() {
@@ -125,6 +129,23 @@ class StatusBarController: ObservableObject {
         
         moveLeft.toggle() // Меняем направление для следующего движения
         moveCount += 1
+    }
+    
+    private func preventSleep() {
+        let reason = "MoveCursor is active" as CFString
+        IOPMAssertionCreateWithName(
+            kIOPMAssertionTypePreventUserIdleSystemSleep as CFString,
+            IOPMAssertionLevel(kIOPMAssertionLevelOn),
+            reason,
+            &assertionID
+        )
+    }
+    
+    private func allowSleep() {
+        if assertionID != 0 {
+            IOPMAssertionRelease(assertionID)
+            assertionID = 0
+        }
     }
     
     func setCustomInterval(_ interval: Int) {
