@@ -1,5 +1,4 @@
-<img width="302" alt="image" src="https://github.com/user-attachments/assets/ba430336-c3ef-489a-a9b9-ab14b4671619">
-
+<img width="293" alt="image" src="https://github.com/user-attachments/assets/c28657e5-311b-48be-b62a-987d2b79785c">
 
 # Mouse Mover for macOS - Stay Online Tool
 
