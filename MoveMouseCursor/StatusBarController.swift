@@ -7,7 +7,8 @@ class StatusBarController: ObservableObject {
     private var popover: NSPopover?
     private var eventMonitor: EventMonitor?
     private var timer: Timer?
-    private var globalKeyMonitor: Any?
+    private var eventTap: CFMachPort?
+    private var runLoopSource: CFRunLoopSource?
     @Published var isMoving = false
     @Published var nextMoveIn: Int = 60
     private var moveInterval: Int = 60
@@ -60,7 +61,7 @@ class StatusBarController: ObservableObject {
     }
     
     private func setupEventMonitor() {
-        eventMonitor = EventMonitor(mask: [NSEvent.EventTypeMask.leftMouseDown, NSEvent.EventTypeMask.rightMouseDown]) { [weak self] event in
+        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
             if let self = self, let popover = self.popover, popover.isShown {
                 self.closePopover(sender: event)
             }
@@ -68,13 +69,40 @@ class StatusBarController: ObservableObject {
     }
     
     private func setupGlobalHotkey() {
-        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            if event.modifierFlags.contains([.shift, .option]) && event.keyCode == 18 { // 18 is the keycode for "1"
-                DispatchQueue.main.async {
-                    self?.toggleMoving()
+        let eventMask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+        guard let eventTap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .defaultTap,
+            eventsOfInterest: eventMask,
+            callback: { (proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? in
+                if let refcon = refcon {
+                    let mySelf = Unmanaged<StatusBarController>.fromOpaque(refcon).takeUnretainedValue()
+                    if type == .keyDown {
+                        let keycode = event.getIntegerValueField(.keyboardEventKeycode)
+                        let flags = event.flags
+                        if keycode == 18 && flags.contains([.maskShift, .maskAlternate]) {
+                            DispatchQueue.main.async {
+                                mySelf.toggleMoving()
+                            }
+                            return nil // Consume the event
+                        }
+                    }
                 }
-            }
+                return Unmanaged.passRetained(event)
+            },
+            userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        ) else {
+            print("Failed to create event tap")
+            return
         }
+
+        self.eventTap = eventTap
+
+        let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
+        CGEvent.tapEnable(tap: eventTap, enable: true)
+        self.runLoopSource = runLoopSource
     }
     
     func toggleMoving() {
@@ -171,8 +199,11 @@ class StatusBarController: ObservableObject {
     }
     
     deinit {
-        if let globalKeyMonitor = globalKeyMonitor {
-            NSEvent.removeMonitor(globalKeyMonitor)
+        if let eventTap = eventTap {
+            CGEvent.tapEnable(tap: eventTap, enable: false)
+        }
+        if let runLoopSource = runLoopSource {
+            CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
         }
     }
 }
