@@ -15,7 +15,7 @@ This SwiftUI application is a mouse movement simulator for macOS. It's designed 
 
 ## How it works:
 1. Set your desired movement interval in seconds
-2. Press "Start Moving" or use the keyboard shortcut (Control + 1)
+2. Press "Start Moving" or use the keyboard shortcut (Control + 1). Global hotkey is (Shift + Option + 1)
 3. The app will move the mouse cursor by 1 pixel at the specified interval
 4. Stop the automation at any time with the same button or shortcut
 
@@ -33,7 +33,7 @@ Note: Use responsibly and in accordance with your organization's policies and th
 - Автоматизация крошечных движений мыши (на 1 пиксель) с настраиваемыми интервалами
 - Интервал по умолчанию установлен на 60 секунд, но полностью настраиваемый
 - Отображение количества движений и времени до следующего движения в реальном времени
-- Горячая клавиша (Control + 1) для запуска/остановки автоматизации
+- Горячая клавиша (Control + 1) для запуска/остановки автоматизации. Глобальная горячая клавиша (Shift + Option + 1)
 - Простой и интуитивно понятный пользовательский интерфейс
 
 ## Как это работает:

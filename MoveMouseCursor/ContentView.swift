@@ -29,7 +29,7 @@ struct ContentView: View {
                 HStack {
                     Text(statusBarController.isMoving ? "Stop Moving" : "Start Moving")
                     Spacer()
-                    Text("Control + 1")
+                    Text("control+1, global shift+option+1")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

@@ -7,6 +7,7 @@ class StatusBarController: ObservableObject {
     private var popover: NSPopover?
     private var eventMonitor: EventMonitor?
     private var timer: Timer?
+    private var globalKeyMonitor: Any?
     @Published var isMoving = false
     @Published var nextMoveIn: Int = 60
     private var moveInterval: Int = 60
@@ -17,9 +18,11 @@ class StatusBarController: ObservableObject {
     init() {
         setupStatusBar()
         setupEventMonitor()
+        setupGlobalHotkey()
+        print("StatusBarController инициализирован")
     }
     
-    func setupStatusBar() {
+    private func setupStatusBar() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let statusBarButton = statusItem?.button {
@@ -32,11 +35,9 @@ class StatusBarController: ObservableObject {
         popover?.contentSize = NSSize(width: 300, height: 250)
         popover?.behavior = .transient
         popover?.contentViewController = NSHostingController(rootView: MouseCursorView().environmentObject(self))
-        
-        print("StatusBarController инициализирован")
     }
     
-    @objc func togglePopover() {
+    @objc private func togglePopover() {
         if let popover = popover {
             if popover.isShown {
                 closePopover(sender: nil)
@@ -46,14 +47,14 @@ class StatusBarController: ObservableObject {
         }
     }
     
-    func showPopover() {
+    private func showPopover() {
         if let statusBarButton = statusItem?.button {
             popover?.show(relativeTo: statusBarButton.bounds, of: statusBarButton, preferredEdge: NSRectEdge.minY)
             eventMonitor?.start()
         }
     }
     
-    func closePopover(sender: Any?) {
+    private func closePopover(sender: Any?) {
         popover?.performClose(sender)
         eventMonitor?.stop()
     }
@@ -62,6 +63,16 @@ class StatusBarController: ObservableObject {
         eventMonitor = EventMonitor(mask: [NSEvent.EventTypeMask.leftMouseDown, NSEvent.EventTypeMask.rightMouseDown]) { [weak self] event in
             if let self = self, let popover = self.popover, popover.isShown {
                 self.closePopover(sender: event)
+            }
+        }
+    }
+    
+    private func setupGlobalHotkey() {
+        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            if event.modifierFlags.contains([.shift, .option]) && event.keyCode == 18 { // 18 is the keycode for "1"
+                DispatchQueue.main.async {
+                    self?.toggleMoving()
+                }
             }
         }
     }
@@ -76,7 +87,7 @@ class StatusBarController: ObservableObject {
         updateStatusBarIcon()
     }
     
-    func startMoving() {
+    private func startMoving() {
         nextMoveIn = moveInterval
         moveLeft = true
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -85,7 +96,7 @@ class StatusBarController: ObservableObject {
         preventSleep()
     }
     
-    func stopMoving() {
+    private func stopMoving() {
         timer?.invalidate()
         timer = nil
         nextMoveIn = moveInterval
@@ -115,23 +126,19 @@ class StatusBarController: ObservableObject {
     }
     
     private func simulateMouseMove() {
-        let moveDistance: CGFloat = 1 // Изменение: движение на число пикселей, тип CGFloat
+        let moveDistance: CGFloat = 1
         let currentPosition = NSEvent.mouseLocation
         let screenFrame = NSScreen.main!.frame
         
         var newX = currentPosition.x + (moveLeft ? -moveDistance : moveDistance)
-        
-        // Проверяем, не вышли ли мы за границы экрана
         newX = max(0, min(newX, screenFrame.width - 1))
         
-        // Преобразуем координаты в систему координат CGPoint
         let newPosition = CGPoint(x: newX, y: screenFrame.height - currentPosition.y)
         
-        // Создаем событие мыши для перемещения курсора
         let mouseMoveEvent = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: newPosition, mouseButton: .left)
         mouseMoveEvent?.post(tap: .cghidEventTap)
         
-        moveLeft.toggle() // Меняем направление для следующего движения
+        moveLeft.toggle()
         moveCount += 1
     }
     
@@ -161,6 +168,12 @@ class StatusBarController: ObservableObject {
     
     func getClickCount() -> Int {
         return moveCount
+    }
+    
+    deinit {
+        if let globalKeyMonitor = globalKeyMonitor {
+            NSEvent.removeMonitor(globalKeyMonitor)
+        }
     }
 }
 
